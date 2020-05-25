@@ -16,45 +16,55 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-# create Patient Tuple for graphing
-Patient = namedtuple('Patient', ['id', 'x', 'y', 'z'])
 # get directory of coatsvillefiles
 dir_coats = 'C:/Users/galea/OneDrive/Documents/#Summer 2020/DATA_VA/Raw Coatesville Data/'
 # create storage for coatsville files
 patients_coats = []
 
-# load coatsville patient id, x,y,z into memory
-# for file in glob.glob(dir_coats + '*.csv'):
-# print(file)
-# add each day to the day coats[]
-# patient_idxyz = pd.read_csv(file, usecols=[1, 5, 6, 7], header=None)
-# print(patient_idxyz)
-# add the raw files to day_coats (file array)
-#   patients_coats.append(patient_idxyz)
-#  print(patients_coats)
 
+# search for patient by id raw data
+def getPatientCoordsRawData(_id):
+    # contains list of dates
+    id_dates = []
+    # contains touples of time
+    day = []
 
-# search for patient (add in return tuple)
-def getPatientCoords(_id):
-    xArray = []
-    yArray = []
-    zArray = []
-    coord = []
+    # first two elements signify day and time
+    # last three are x y z
+
     file = dir_coats + 'ids/' + str(_id) + '.csv'
-    patient_xyz = pd.read_csv(file, usecols=[5, 6, 7], header=None)
-    for index, row in patient_xyz.iterrows():
+    # we need to store by day
+    patient_date_xyz = pd.read_csv(file, usecols=[4, 5, 6, 7], header=None)
+    # get first date EVER
+    dateInUse = patient_date_xyz.iat[0, 0].split(" ", 1)
+    for index, row in patient_date_xyz.iterrows():
+        # split the date
+        # dateInUse = patient_date_xyz.iat[index, 0].split(" ", 1)
+        # check to see if the new value is not the same date
+        if dateInUse != patient_date_xyz.iat[index, 0].split(" ", 1)[0]:
+            # add old data into appropriate date
+            id_dates.append(day)
+            # clear old data
+            day.clear()
+            # store the new date that we are going to be working with.
+            dateInUse = patient_date_xyz.iat[index, 0].split(" ", 1)[0]
+
+        # hour/min/sec x y z
+        day.append(tuple(
+            [patient_date_xyz.iat[index, 0].split(" ", 1)[1], patient_date_xyz.iat[index, 1], patient_date_xyz.iat[index, 2],
+             patient_date_xyz.iat[index, 3]]))
+        # print last day as a debug test
+        print(day[-1])
+
         # print(type(index))
-        # print(type(patient_xyz))
-        # print(patient_xyz.iat[index,0])
+        # print(type(patient_date_xyz))
+        # print(patient_date_xyz.iat[index,0])
         # print(type(x))
-        xArray.append(int(patient_xyz.iat[index, 0]))
+        # xArray.append(int(patient_date_xyz.iat[index, 1]))
         # print(type(xArray))
-        yArray.append(int(patient_xyz.iat[index, 1]))
-        zArray.append(int(patient_xyz.iat[index, 2]))
-    coord.append(xArray)
-    coord.append(yArray)
-    coord.append(zArray)
-    return coord
+        # yArray.append(int(patient_date_xyz.iat[index, 2]))
+        # zArray.append(int(patient_date_xyz.iat[index, 3]))
+    return id_dates
 
 
 root = Tk()
@@ -72,12 +82,12 @@ coatsville_blueprint.grid(row=0, column=0, columnspan=5)
 def command(call):
     if call == 5:
         id = Patient.get()
-        coord = getPatientCoords(int(id))
+        coord = getPatientCoordsRawData(int(id))
         # print(id)
-        print(coord)
+        # print(coord)
         printout = Label(root, text=id)
         printout.grid(row=0, column=6, columnspan=1)
-        plt.scatter(coord[0], coord[1], c=coord[2])
+        # plt.scatter(coord[0], coord[1], c=coord[2])
         plt.gray()
         plt.show()
         return
