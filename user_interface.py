@@ -12,17 +12,24 @@ import glob
 import sys
 from collections import namedtuple
 
-class date_s:
-    def __init__(self):
+class the_date:
+    def __init__(self, day):
+        self.day = day
+
+class time_coord:
+    def __init__(self, hour_min_sec, x, y, z):
         # an array of times pertaining to this date
-        self.time = []
+        self.hour_min_sec = hour_min_sec
+        self.x = x
+        self.y = y
+        self.z = z
+
 
 class patient_data:
-    def __init__(self, id):
-        self.id = id;
+    def __init__(self, _id):
+        self.id = _id;
         # storage by day which contains time per day
         self.date = []
-
 
 
 pd.set_option('display.max_rows', 500)
@@ -31,14 +38,14 @@ pd.set_option('display.width', 1000)
 
 # get directory of coatsvillefiles
 dir_coats = 'C:/Users/galea/OneDrive/Documents/#Summer 2020/DATA_VA/Raw Coatesville Data/'
+
+
 # create storage for coatsville files
 
 
 # search for patient by id raw data
 def getPatientCoordsRawData(_id):
-    # contains list of dates
-    id_dates = []
-    # contains touples of time
+    # contains day storage for time coord
     day = []
 
     # first two elements signify day and time
@@ -46,27 +53,35 @@ def getPatientCoordsRawData(_id):
 
     file = dir_coats + 'ids/' + str(_id) + '.csv'
     # we need to store by day
-    patient_date_xyz = pd.read_csv(file, usecols=[2, 3, 4, 5, 6, 7], header=None)
+    patient_date_xyz = pd.read_csv(file, usecols=[4, 5, 6, 7], header=None)
+    # construct
+    patient = patient_data(_id)
+
     # get first date EVER
-    dateInUse = patient_date_xyz.iat[2, 2].split(" ", 1)
+    dateInUse = patient_date_xyz.iat[0, 0].split(" ", 1)
     for index, row in patient_date_xyz.iterrows():
         # split the date
         # dateInUse = patient_date_xyz.iat[index, 0].split(" ", 1)
         # check to see if the new value is not the same date
         if dateInUse != patient_date_xyz.iat[index, 0].split(" ", 1)[0]:
             # add old data into appropriate date
-            id_dates.append(day)
+            patient.date.append(day)
             # clear old data
             day.clear()
             # store the new date that we are going to be working with.
             dateInUse = patient_date_xyz.iat[index, 0].split(" ", 1)[0]
 
         # hour/min/sec x y z
-        day.append(tuple(
-            [patient_date_xyz.iat[index, 0].split(" ", 1)[1], patient_date_xyz.iat[index, 1], patient_date_xyz.iat[index, 2],
-             patient_date_xyz.iat[index, 3]]))
+        day.append(time_coord(
+            patient_date_xyz.iat[index, 0].split(" ", 1)[1],
+            patient_date_xyz.iat[index, 1],
+            patient_date_xyz.iat[index, 2],
+            patient_date_xyz.iat[index, 3]
+        ))
+        print(day[0].hour_min_sec, day[0].x, day[0].y, day[0].z)
+        print(day)
+
         # print last day as a debug test
-        print(day[-1])
 
         # print(type(index))
         # print(type(patient_date_xyz))
@@ -76,7 +91,14 @@ def getPatientCoordsRawData(_id):
         # print(type(xArray))
         # yArray.append(int(patient_date_xyz.iat[index, 2]))
         # zArray.append(int(patient_date_xyz.iat[index, 3]))
-    return id_dates
+    # add old data into appropriate date
+    print(day[0].hour_min_sec)
+    patient.date.append(day)
+    print(patient.date[0][0].hour_min_sec)
+    # clear old data
+    day.clear()
+    # print(patient.date)
+    return patient
 
 
 root = Tk()
@@ -93,8 +115,8 @@ coatsville_blueprint.grid(row=0, column=0, columnspan=5)
 
 def command(call):
     if call == 5:
-        id = Patient.get()
-        coord = getPatientCoordsRawData(int(id))
+        _id = Patient.get()
+        coord = getPatientCoordsRawData(int(_id))
         # print(id)
         # print(coord)
         printout = Label(root, text=id)
@@ -114,7 +136,7 @@ play = Button(root, text="Play", command=lambda: command(2))
 fastforward = Button(root, text=">>", command=lambda: command(3))
 Select_Facility = OptionMenu(root, clicked, "Coatsville", "Philadelphia", "SEARCHING")
 Patient = Entry(root)
-Patient.insert(0, "Enter Patient Number")
+Patient.insert(0, '')
 Select_Patient = Button(root, text="Select Patient", command=lambda: command(5))
 rewind.grid(row=1, column=0, columnspan=1)
 pause.grid(row=1, column=1, columnspan=1)
