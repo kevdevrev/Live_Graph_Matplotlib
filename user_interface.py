@@ -12,6 +12,19 @@ import glob
 import sys
 from collections import namedtuple
 
+class date_s:
+    def __init__(self):
+        # an array of times pertaining to this date
+        self.time = []
+
+class patient_data:
+    def __init__(self, id):
+        self.id = id;
+        # storage by day which contains time per day
+        self.date = []
+
+
+
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
@@ -19,7 +32,6 @@ pd.set_option('display.width', 1000)
 # get directory of coatsvillefiles
 dir_coats = 'C:/Users/galea/OneDrive/Documents/#Summer 2020/DATA_VA/Raw Coatesville Data/'
 # create storage for coatsville files
-patients_coats = []
 
 
 # search for patient by id raw data
@@ -34,9 +46,9 @@ def getPatientCoordsRawData(_id):
 
     file = dir_coats + 'ids/' + str(_id) + '.csv'
     # we need to store by day
-    patient_date_xyz = pd.read_csv(file, usecols=[4, 5, 6, 7], header=None)
+    patient_date_xyz = pd.read_csv(file, usecols=[2, 3, 4, 5, 6, 7], header=None)
     # get first date EVER
-    dateInUse = patient_date_xyz.iat[0, 0].split(" ", 1)
+    dateInUse = patient_date_xyz.iat[2, 2].split(" ", 1)
     for index, row in patient_date_xyz.iterrows():
         # split the date
         # dateInUse = patient_date_xyz.iat[index, 0].split(" ", 1)
