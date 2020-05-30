@@ -1,11 +1,9 @@
-
 import numpy as np
 import pandas as pd
 
-
 import csv
 import re
-#handling loading of files
+# handling loading of files
 import fileinput
 import glob
 import sys
@@ -20,12 +18,13 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 # get directory of coatsvillefiles
-dir_coats = 'C:/Users/galea/OneDrive/Documents/#Summer 2020/DATA_VA/Raw Coatesville Data/'
+dir_coats = 'C:/Users/galea/OneDrive/Documents/#Summer 2020/DATA_VA/Raw Philadelphia Data/'
 # create storage for coatsville files
 patients_coats = []
 # load coatsville patient id, x,y,z into memory
 
-patient_ids_unique = [20708, 23001, 24801, 20000, 20580, 11090, 10101, 22230, 21077, 20058, 20604, 10110]
+patient_ids_unique = [1422, 11701, 11702, 11802, 11902, 12102, 12702, 12802, 13401, 13702, 13901, 13902, 14201, 14202,
+                      14032, 14402, '2B001']
 # this here loads all the files into memory per facility
 num_files = 0
 for file in glob.glob(dir_coats + '*.csv'):
@@ -40,8 +39,7 @@ for file in glob.glob(dir_coats + '*.csv'):
 # print(patients_coats)
 
 # def getUniqueIds():
-    # get all ids and add to a list
-
+# get all ids and add to a list
 
 
 def patientFileCreator(_id):
@@ -68,26 +66,26 @@ def patientFileCreator(_id):
             # parse currently looking at id
 
             # print(id)
-            #print(str(id_being_checked) + ' ' + str(_id))
-            #print(id_being_checked == _id)
+            # print(str(id_being_checked) + ' ' + str(_id))
+            # print(id_being_checked == _id)
 
-            if int(patients_coats[index].iloc[jndex, 1]) == _id:
-                if(path.isfile(filename)):
+            if str(patients_coats[index].iloc[jndex, 1]) == str(_id):
+                if path.isfile(filename):
                     tempPatient.append(patients_coats[index].iloc[[jndex]])
-                    #free some memory by writing to file
-                    if (sys.getsizeof(tempPatient) > 8000000):
-                        #concatinate all the list into a dataframe
+                    # free some memory by writing to file
+                    if sys.getsizeof(tempPatient) > 8000000:
+                        # concatinate all the list into a dataframe
                         tempPatientDataframe = pd.concat(tempPatient)
-                        tempPatientDataframe.to_csv(filename, mode = 'a', header=False, index=False)
-                        #clear the dataframe
+                        tempPatientDataframe.to_csv(filename, mode='a', header=False, index=False)
+                        # clear the dataframe
                         tempPatientDataframe.drop(tempPatientDataframe.index, inplace=True)
                         print("size of dataframe: " + str(sys.getsizeof(tempPatientDataframe)))
-                        #clear the list
+                        # clear the list
                         tempPatient.clear()
                         print("size of list: " + str(sys.getsizeof(tempPatient)))
 
                 else:
-                    #should occur on the first find of the id in the fileset and execute once
+                    # should occur on the first find of the id in the fileset and execute once
                     tempPatient.append(patients_coats[index].iloc[[jndex]])
                     tempPatientDataframe = pd.concat(tempPatient)
                     tempPatientDataframe.to_csv(filename, header=False, index=False)
@@ -95,10 +93,9 @@ def patientFileCreator(_id):
                 # now we want to append it to the file named after patient (to dataframe type)
                 # print("match")
             #    print("the id raw")
-             # #  print(id_being_checked)
-               # print("the iloc")
-                #print(patients_coats[index].iloc[jndex, 1])
-
+            # #  print(id_being_checked)
+            # print("the iloc")
+            # print(patients_coats[index].iloc[jndex, 1])
 
             # print(tempPatient)
             # x = patients_coats[index].iloc[jndex, 1]
@@ -122,7 +119,7 @@ def createAllPatientFiles():
         patientFileCreator(_id)
 
 
-#patient_ids_unique = getUniqueIds()
+# patient_ids_unique = getUniqueIds()
 createAllPatientFiles()
 # patientFileCreator(20708)
 
