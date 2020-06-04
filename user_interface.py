@@ -118,22 +118,41 @@ def getPatientCoordsRawData(_id):
 
 
 def graphIt(patient):
-    fig = plt.figure(figsize=(12, 8))
-    ax = fig.add_subplot(111, projection='3d')
+    print("graphing now")
+    plt.axis([0, 10, 0, 1])
 
+    for i in range(10):
+        y = np.random.random()
+        plt.scatter(i, y, color='C2')
+        plt.plot(i,y, color='C0')
+        plt.pause(0.05)
+
+    plt.show()
+    plt.clf()
+    plt.cla()
+    plt.close()
     # how to access
+    x = 0;
     for i in range(len(patient.dates)):
+        print("in i loop")
         plt.clf()
         # print(patient.dates[i])
         for j in range(len(patient.dates[i].time)):
-            ax.scatter(patient.dates[i].time[j].x, patient.dates[i].time[j].y, patient.dates[i].time[j].z)
-            ax.set_xlabel('x axis')
-            ax.set_ylabel('y axis')
-            ax.set_zlabel('z axis')
-            plt.show()
+            x = x + 1
+            if x == 60:
+                plt.clf()
+                x = 0
+
+            print("in j loop")
+            plt.plot(patient.dates[i].time[j].x, patient.dates[i].time[j].y, zorder=1)
+            # plt.scatter(patient.dates[i].time[j].x, patient.dates[i].time[j].y, zorder=2)
+            print("point plotted")
+            print(patient.dates[i].time[j].x, patient.dates[i].time[j].y)
             # ax.scatter3D(patient.dates[i].time[j].x, patient.dates[i].time[j].y, patient.dates[i].time[j].z);
-            plt.pause(0.05)
-            # print(patient.dates[i].time[j].hour_min_sec)
+            plt.pause(0.2)
+            plt.draw()
+    plt.show()
+
 
 
 root = Tk()
